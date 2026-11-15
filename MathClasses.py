@@ -82,6 +82,15 @@ class Vec3:
             a.x*b.y-a.y*b.x,
             )
     
+    def toTuple(self):
+        return (self.x,self.y,self.z)
+    
+    def toIntTuple(self):
+        return (int(self.x),int(self.y),int(self.z))
+    
+    def toTupleRounded(self,digits:int):
+        return f'({str(round(self.x,digits)).ljust(digits+2,'0')}, {str(round(self.y,digits)).ljust(digits+2,'0')}, {str(round(self.z,digits)).ljust(digits+2,'0')})'
+    
 Vec3.UP     = Vec3(0,0,1)
 Vec3.RIGHT  = Vec3(0,0,1)
 Vec3.ZERO   = Vec3(0,0,0)
