@@ -102,8 +102,8 @@ class Camera:
         
         for y in range(self.res[1]):
             
-            # if y == 0 or y+1 == self.res[1] or y%50 == 0:
-            #     print(f'\r{round((y+1)/self.res[1]*100,1)}%',end='',flush=True)
+            if y == 0 or y+1 == self.res[1] or y%100 == 0:
+                print(f'\r{round((y+1)/self.res[1]*100,1)}%',end='',flush=True)
 
             for x in range(self.res[0]):
                 color = self.shootRayFromPixel(x,y)
