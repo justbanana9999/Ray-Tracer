@@ -15,12 +15,19 @@ def raySphereIntersection(ray:Ray,sphere:Sphere) -> tuple[bool, Vec3,Vec3]:
         d = -Vec3.dot(u,o-c)
         hitPoint = o+u*d
         normal = Vec3.getNormal(hitPoint,c)
-        return True,hitPoint,normal
+        if d >= 0:
+            return True,hitPoint,normal
+        else:
+            return False,Vec3.ZERO,Vec3.ZERO
     elif nabla > 0:
         d = -Vec3.dot(u,o-c) - sqrt(nabla)
         # dFurthest = -Vec3.dot(u,o-c) + sqrt(nabla)
         hitPoint = o+u*d
         normal = Vec3.getNormal(hitPoint,c)
-        return True,hitPoint,normal
+        if d >= 0:
+            return True,hitPoint,normal
+        else:
+            return False,Vec3.ZERO,Vec3.ZERO
+
     else:
         return False,Vec3.ZERO,Vec3.ZERO

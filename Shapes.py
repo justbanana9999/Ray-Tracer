@@ -6,7 +6,7 @@ class Ray:
         self.direction = direction
 
 class Scene:
-    def __init__(self,shapeList:list[Sphere]):
+    def __init__(self,shapeList:list['Sphere']):
         self.shapeList = shapeList
 
 class Sphere:

@@ -66,13 +66,16 @@ class Camera:
         bounce = 0
         while bounce < self.maxBounces+1:
             bounce += 1
+            hitAnything = False
             for sphere in self.scene.shapeList:
                 hit,hitPos,hitNormal = raySphereIntersection(pixelRay,sphere)
                 if hit:
-                    pixelRay.direction = -Vec3.reflect(pixelRay.direction,hitNormal)
+                    pixelRay.direction = Vec3.reflect(pixelRay.direction,hitNormal)
                     pixelRay.origin = hitPos
-                # return hitNormal
-                # return Vec3(1,1,1)
+                    hitAnything = True
+            
+            if not hitAnything:
+                break
         
         return -pixelRay.direction
     
