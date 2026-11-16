@@ -64,7 +64,7 @@ class Camera:
         pixelRay = Ray(self.pos,(self.pixelPos-self.pos).normalized())
 
         bounce = 0
-        while bounce < self.maxBounces+1:
+        while bounce < self.maxBounces:
             bounce += 1
             hitAnything = False
             for sphere in self.scene.shapeList:
