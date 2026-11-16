@@ -9,6 +9,7 @@ class Vec3:
     
     UP:ClassVar['Vec3']
     RIGHT:ClassVar['Vec3']
+    FORWARD:ClassVar['Vec3']
     ZERO:ClassVar['Vec3']
     ONE:ClassVar['Vec3']
 
@@ -92,6 +93,7 @@ class Vec3:
         return f'({str(round(self.x,digits)).ljust(digits+2,'0')}, {str(round(self.y,digits)).ljust(digits+2,'0')}, {str(round(self.z,digits)).ljust(digits+2,'0')})'
     
 Vec3.UP     = Vec3(0,0,1)
-Vec3.RIGHT  = Vec3(0,0,1)
+Vec3.RIGHT  = Vec3(1,0,0)
+Vec3.FORWARD  = Vec3(0,1,0)
 Vec3.ZERO   = Vec3(0,0,0)
 Vec3.ONE    = Vec3(1,1,1)
