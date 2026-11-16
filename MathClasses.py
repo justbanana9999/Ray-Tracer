@@ -7,15 +7,15 @@ class Vec3:
         self.y:float = y
         self.z:float = z
     
-    UP:ClassVar[Vec3]
-    RIGHT:ClassVar[Vec3]
-    ZERO:ClassVar[Vec3]
-    ONE:ClassVar[Vec3]
+    UP:ClassVar['Vec3']
+    RIGHT:ClassVar['Vec3']
+    ZERO:ClassVar['Vec3']
+    ONE:ClassVar['Vec3']
 
     def __repr__(self):
         return f'Vec3({self.x}, {self.y}, {self.z})'
     
-    def __mul__(self,other:Vec3|int|float):
+    def __mul__(self,other:'Vec3|int|float'):
         if isinstance(other,Vec3):
             return Vec3(
                 self.x*other.x,
@@ -28,7 +28,7 @@ class Vec3:
             self.z*other,
             )
     
-    def __truediv__(self,other:Vec3|int|float):
+    def __truediv__(self,other:'Vec3|int|float'):
         if isinstance(other,Vec3):
             return Vec3(
                 self.x/other.x,
@@ -41,14 +41,14 @@ class Vec3:
             self.z/other,
             )
     
-    def __sub__(self,other:Vec3):
+    def __sub__(self,other:'Vec3'):
         return Vec3(
             self.x-other.x,
             self.y-other.y,
             self.z-other.z,
             )
     
-    def __add__(self,other:Vec3):
+    def __add__(self,other:'Vec3'):
         return Vec3(
             self.x+other.x,
             self.y+other.y,
@@ -71,11 +71,11 @@ class Vec3:
         return self/self.length()
     
     @staticmethod
-    def dot(a:Vec3,b:Vec3):
+    def dot(a:'Vec3',b:'Vec3'):
         return a.x*b.x + a.y*b.y + a.z*b.z
     
     @staticmethod
-    def cross(a:Vec3,b:Vec3):
+    def cross(a:'Vec3',b:'Vec3'):
         return Vec3(
             a.y*b.z-a.z*b.y,
             a.z*b.x-a.x*b.z,
