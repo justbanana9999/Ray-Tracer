@@ -1,13 +1,10 @@
 from MathClasses import Vec3
 from Canvas import Canvas
-
-class Ray:
-    def __init__(self,pos:Vec3,direction:Vec3):
-        self.pos = pos
-        self.direction = direction
+from Shapes import Ray, Scene
+from intersections import raySphereIntersection
 
 class Camera:
-    def __init__(self,pos:Vec3,pointAt:Vec3,res:tuple[int,int],focalLength:float):
+    def __init__(self,pos:Vec3,pointAt:Vec3,res:tuple[int,int],focalLength:float,scene:Scene,maxBounces:int):
         self.res = res
         self.pos = pos
         self.lookAt = pointAt
@@ -25,6 +22,9 @@ class Camera:
         self.pixelPos:Vec3
 
         self.canvas:Canvas
+
+        self.scene = scene
+        self.maxBounces = maxBounces
     
     def updateAspectRatio(self):
         self.aspectRatio = self.res[0]/self.res[1]
@@ -62,7 +62,19 @@ class Camera:
     def shootRayFromPixel(self,x:int,y:int) -> Vec3:
         self.getPixelWorldPos(x,y)
         pixelRay = Ray(self.pos,(self.pixelPos-self.pos).normalized())
-        return pixelRay.direction
+
+        bounce = 0
+        while bounce < self.maxBounces+1:
+            bounce += 1
+            for sphere in self.scene.shapeList:
+                hit,hitPos,hitNormal = raySphereIntersection(pixelRay,sphere)
+                if hit:
+                    pixelRay.direction = -Vec3.reflect(pixelRay.direction,hitNormal)
+                    pixelRay.origin = hitPos
+                # return hitNormal
+                # return Vec3(1,1,1)
+        
+        return -pixelRay.direction
     
     def render(self):
         self.updateAxes()
@@ -71,14 +83,6 @@ class Camera:
         for y in range(self.res[1]):
             for x in range(self.res[0]):
                 color = self.shootRayFromPixel(x,y)
-                # if (x,y) == (49,0):
-                #     print(color.toTupleRounded(1))
-                # color.x = 1-(color.x+1)/2
-                # color.y = 1-(color.y+1)/2
-                # color.z = 1-(color.z+1)/2
-                # color = Vec3.ONE-color
-                # color = -color*2-Vec3.ONE
-                color = -color
                 self.canvas.putPixel((x,y),color)
         
         # print(self.canvas)

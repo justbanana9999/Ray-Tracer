@@ -68,8 +68,15 @@ class Vec3:
     def length(self):
         return dist((0,0,0),(self.x,self.y,self.z))
     
+    def lengthSquared(self):
+        return Vec3.dot(self,self)
+    
     def normalized(self):
         return self/self.length()
+    
+    @staticmethod
+    def getNormal(a:'Vec3',b:'Vec3'):
+        return (a-b).normalized()
     
     @staticmethod
     def dot(a:'Vec3',b:'Vec3'):
@@ -91,6 +98,21 @@ class Vec3:
     
     def toTupleRounded(self,digits:int):
         return f'({str(round(self.x,digits)).ljust(digits+2,'0')}, {str(round(self.y,digits)).ljust(digits+2,'0')}, {str(round(self.z,digits)).ljust(digits+2,'0')})'
+    
+    @staticmethod
+    def reflect(incoming:'Vec3',normal:'Vec3'):
+        return  incoming - normal*2*Vec3.dot(incoming,normal)
+    
+    '''
+    @MISC {13263,
+        TITLE = {How to get a reflection vector?},
+        AUTHOR = {Phrogz (https://math.stackexchange.com/users/4241/phrogz)},
+        HOWPUBLISHED = {Mathematics Stack Exchange},
+        NOTE = {URL:https://math.stackexchange.com/q/13263 (version: 2010-12-06)},
+        EPRINT = {https://math.stackexchange.com/q/13263},
+        URL = {https://math.stackexchange.com/q/13263}
+    }
+    '''
     
 Vec3.UP     = Vec3(0,0,1)
 Vec3.RIGHT  = Vec3(1,0,0)
