@@ -29,9 +29,9 @@ class Triangle:
         return f' a = {self.a}, b = {self.b}, c = {self.c}'
 
     def generateNormal(self):
-        e1 = (self.b-self.a).normalized()
-        e2 = (self.c-self.a).normalized()
-        self.normal = Vec3.cross(e1,e2)
+        e1 = (self.b-self.a)
+        e2 = (self.c-self.a)
+        self.normal = Vec3.cross(e1,e2).normalized()
     
     @staticmethod
     def generatePlane(center:Vec3,size:tuple[float,float],orientation:str='UP'):
