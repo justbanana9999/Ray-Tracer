@@ -64,18 +64,24 @@ class Camera:
         pixelRay = Ray(self.pos,(self.pixelPos-self.pos).normalized())
 
         bounce = 0
-        while bounce < self.maxBounces:
+        while bounce < self.maxBounces+3:
+            if bounce == self.maxBounces+2:
+                return Vec3.ZERO
             bounce += 1
-            hitAnything = False
+            hitList:list[tuple[Vec3,Vec3]] = []
             for sphere in self.scene.shapeList:
                 hit,hitPos,hitNormal = raySphereIntersection(pixelRay,sphere)
                 if hit:
-                    pixelRay.direction = Vec3.reflect(pixelRay.direction,hitNormal)
-                    pixelRay.origin = hitPos
-                    hitAnything = True
+                    hitList.append((hitPos,hitNormal))
             
-            if not hitAnything:
+            if len(hitList) == 0:
                 break
+            else:
+                hitList = sorted(hitList,key=lambda x: (pixelRay.origin-x[0]).length())
+                hitPos,hitNormal = hitList[0]
+                pixelRay.direction = Vec3.reflect(pixelRay.direction,hitNormal)
+                pixelRay.origin = hitPos
+                pixelRay.origin += pixelRay.direction*0.001
         
         return -pixelRay.direction
     

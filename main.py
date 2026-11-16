@@ -5,9 +5,9 @@ from Shapes import Scene, Sphere
 from time import time
 
 scene = Scene([Sphere(Vec3(0,3,0),1),Sphere(Vec3(2,3,0),1),Sphere(Vec3(-2,3,0),1)])
-# scene = Scene([Sphere(Vec3(0,-3,0),1)])
+# scene = Scene([Sphere(Vec3(0,3,0),1)])
 
-cam = Camera(Vec3(0,0,0),Vec3(0,1,0),(500,500),25,scene,2)
+cam = Camera(Vec3(0,0,0),Vec3(0,1,0),(500,500),25,scene,4)
 
 tStart = time()
 
