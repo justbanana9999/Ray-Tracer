@@ -14,7 +14,7 @@ class Vec3:
     ONE:ClassVar['Vec3']
 
     def __repr__(self):
-        return f'Vec3({self.x}, {self.y}, {self.z})'
+        return f'Vec3({str(round(self.x,3)).ljust(6,'0')}, {str(round(self.y,3)).ljust(6,'0')}, {str(round(self.z,3)).ljust(6,'0')})'
     
     def __mul__(self,other:'Vec3|int|float'):
         if isinstance(other,Vec3):

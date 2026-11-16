@@ -1,7 +1,7 @@
 from MathClasses import Vec3
 from Canvas import Canvas
-from Shapes import Ray, Scene
-from intersections import raySphereIntersection
+from Shapes import Ray, Scene, Sphere
+from intersections import raySphereIntersection, rayTriangleIntersection
 
 class Camera:
     def __init__(self,pos:Vec3,pointAt:Vec3,res:tuple[int,int],focalLength:float,scene:Scene,maxBounces:int):
@@ -67,32 +67,49 @@ class Camera:
         while bounce < self.maxBounces+3:
             if bounce == self.maxBounces+2:
                 return Vec3.ZERO
-            bounce += 1
             hitList:list[tuple[Vec3,Vec3]] = []
-            for sphere in self.scene.shapeList:
-                hit,hitPos,hitNormal = raySphereIntersection(pixelRay,sphere)
+            hit = False
+            for shape in self.scene.shapeList:
+                if isinstance(shape,Sphere):
+                    hit,hitPos,hitNormal = raySphereIntersection(pixelRay,shape)
+                # elif isinstance(shape,Triangle):
+                else:
+                    hit,hitPos,hitNormal = rayTriangleIntersection(pixelRay,shape)
+                
                 if hit:
                     hitList.append((hitPos,hitNormal))
             
             if len(hitList) == 0:
+                # print(bounce,pixelRay)
                 break
             else:
                 hitList = sorted(hitList,key=lambda x: (pixelRay.origin-x[0]).length())
+                # if bounce == 1:
+                #     return Vec3.UP if len(hitList) == 1 else Vec3.RIGHT
                 hitPos,hitNormal = hitList[0]
-                pixelRay.direction = Vec3.reflect(pixelRay.direction,hitNormal)
+                pixelRay.vector = Vec3.reflect(pixelRay.vector,hitNormal)
                 pixelRay.origin = hitPos
-                pixelRay.origin += pixelRay.direction*0.001
+                # pixelRay.origin += pixelRay.vector*0.01
+                # print(hitList)
+                # print(bounce,pixelRay)
+            bounce += 1
         
-        return -pixelRay.direction
+        return -pixelRay.vector
     
     def render(self):
         self.updateAxes()
         self.updateSizeAndCanvas()
         
         for y in range(self.res[1]):
+            
+            # if y == 0 or y+1 == self.res[1] or y%50 == 0:
+            #     print(f'\r{round((y+1)/self.res[1]*100,1)}%',end='',flush=True)
+
             for x in range(self.res[0]):
                 color = self.shootRayFromPixel(x,y)
                 self.canvas.putPixel((x,y),color)
         
         # print(self.canvas)
         self.canvas.saveToFile('test.png')
+
+        print()
