@@ -112,4 +112,4 @@ class Camera:
         # print(self.canvas)
         self.canvas.saveToFile('test.png')
 
-        print()
+        print(' '*10,end='\r')
