@@ -140,6 +140,17 @@ class Vec3:
         scatterVector = (right*randomPoint.x+front*randomPoint.y+up*randomPoint.z).normalized()
 
         return scatterVector
+
+    @staticmethod
+    def vectorSum(vectorList:list['Vec3']):
+        s = Vec3.ZERO
+        for l in vectorList:
+            s += l
+        return s
+
+    @staticmethod
+    def average(vectorList:list['Vec3']):
+        return Vec3.vectorSum(vectorList)/len(vectorList)
     
     '''
     @MISC {13263,

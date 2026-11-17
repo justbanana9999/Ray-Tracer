@@ -4,26 +4,32 @@ class Ray:
     def __init__(self,origin:Vec3,vector:Vec3):
         self.origin = origin
         self.vector = vector
+        self.color = Vec3.ONE
+        self.incoming = Vec3.ZERO
     def __repr__(self):
         return f'ori = {self.origin}, vec = {self.vector}'
 
-class Scene:
-    def __init__(self,shapeList:list['Sphere|Triangle']):
-        self.shapeList = shapeList
+class Color:
+    def __init__(self,diffuse:Vec3=Vec3.ZERO,emission:Vec3=Vec3.ZERO):
+        self.diffuse = diffuse
+        self.emission = emission
 
 class Sphere:
-    def __init__(self,center:Vec3,radius:float):
+    def __init__(self,center:Vec3,radius:float,color:Color=Color(Vec3.ONE*0.95)):
         self.center = center
         self.radius = radius
+        self.color = color
 
 class Triangle:
-    def __init__(self,a:Vec3,b:Vec3,c:Vec3):
+    def __init__(self,a:Vec3,b:Vec3,c:Vec3,color:Color=Color(Vec3.ONE*0.95)):
         self.a = a
         self.b = b
         self.c = c
 
         self.normal:Vec3
         self.generateNormal()
+
+        self.color = color
     
     def __repr__(self):
         return f' a = {self.a}, b = {self.b}, c = {self.c}'
@@ -74,3 +80,12 @@ class Triangle:
                     Vec3(center.x-size[0],center.y+size[1],center.z),
                 ),
             ]
+
+# class Shape:
+#     def __init__(self,shape:Sphere|Triangle,color:Vec3):
+#         self.shape = shape
+#         self.color = color
+
+class Scene:
+    def __init__(self,shapeList:list[Sphere|Triangle]):
+        self.shapeList = shapeList
