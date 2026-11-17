@@ -1,3 +1,4 @@
+from random import seed
 from time import perf_counter
 
 from MathClasses import Vec3
@@ -43,7 +44,7 @@ class Camera:
 
         self.canvas = Canvas(self.res[0],self.res[1])
 
-    def getPixelWorldPos(self,x:int,y:int):
+    def getPixelLocalPos(self,x:int,y:int):
 
         self.pixelSize = self.width/self.res[0]
 
@@ -55,8 +56,8 @@ class Camera:
         colorList:list[Vec3] = []
 
         for _ in range(self.samples):
-            self.getPixelWorldPos(x,y)
-            pixelRay = Ray(self.pos,(self.pixelPos-self.pos).normalized())
+            self.getPixelLocalPos(x,y)
+            pixelRay = Ray(self.pos,self.pixelPos.normalized())
 
             bounce = 0
             while bounce < self.maxBounces+3:
@@ -84,15 +85,14 @@ class Camera:
                     hitPos,hitNormal,hitColor = hitList[0]
 
                     pixelRay.vector = Vec3.scatterTowardsNormal(pixelRay.vector,hitNormal)
+                    lightStrength = Vec3.dot(pixelRay.vector,hitNormal)*2
                     # pixelRay.vector = Vec3.reflect(pixelRay.vector,hitNormal)
                     
                     pixelRay.incoming += hitColor.emission * pixelRay.color
-                    pixelRay.color *= hitColor.diffuse
+                    pixelRay.color *= hitColor.diffuse * lightStrength
                     
                     pixelRay.origin = hitPos
                     # pixelRay.origin += pixelRay.vector*0.01
-                    # print(hitList)
-                    # print(bounce,pixelRay)
                 bounce += 1
             
             # colorList.append(pixelRay.color)
@@ -114,6 +114,7 @@ class Camera:
         self.updateSizeAndCanvas()
         
         rowSpeedAvg = 0
+        rayCalcSpeedAvg = 0
         etaMeasureSize = 10
         renderedRows = -1
         
@@ -127,9 +128,11 @@ class Camera:
                 if elapsed2 > etaMeasureSize:
                     tStart2 = perf_counter()
                     rowSpeedAvg = renderedRows/etaMeasureSize
+                    # pixels * samples
+                    rayCalcSpeedAvg = int(rowSpeedAvg*self.res[0])
                     renderedRows = 0
                 
-                if elapsed1 > 1:
+                if elapsed1 > 0.5:
                     tStart1 = perf_counter()
                     percentage = f'{round((y+1)/self.res[1]*100,1)}%'
                     percentage = percentage.ljust(5,' ')
@@ -146,9 +149,10 @@ class Camera:
                         else:
                             eta = f'{etaInt} s'
                     end = ' '*10
-                    print(f'\r{percentage} | {eta} | {rowSpeedAvg}/s {end}',end='',flush=True)
+                    print(f'\r{percentage} | {eta} | {rayCalcSpeedAvg} r/s {end}',end='',flush=True)
 
             for x in range(self.res[0]):
+                seed(y*self.res[0]+x)
                 color = self.shootRayFromPixel(x,y)
                 self.canvas.putPixel((x,y),color)
         
@@ -156,4 +160,11 @@ class Camera:
         self.canvas.saveToFile('test.png')
 
         if progress:
-            print(' '*50,end='\r')
+            print()
+            # print(' '*50,end='\r')
+        
+        elapsed = round(perf_counter()-tStart,1)
+        if elapsed >= 60:
+            print(f'{elapsed//60} m {elapsed%60} s')
+        else:
+            print(f'{elapsed} s')

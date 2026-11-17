@@ -3,7 +3,7 @@ from math import sqrt
 from PIL import Image
 
 img1 = Image.open('Blender.png')
-img2 = Image.open('test copy.png')
+img2 = Image.open('test.png')
 
 errorList = []
 
@@ -13,6 +13,10 @@ for y in range(img1.width):
         p1 = (p1[0]/255,p1[1]/255,p1[2]/255)
         p2 = img2.getpixel((x,y))
         p2 = (p2[0]/255,p2[1]/255,p2[2]/255)
+        # Skip emission and background
+        if p1 == p2:
+            if p1 == (0,0,0) or p1 == (1,1,1):
+                continue
         errorList.append(sqrt((p1[0]-p2[0])**2+(p1[1]-p2[1])**2+(p1[2]-p2[2])**2))
 
 error = sum(errorList)/len(errorList)/sqrt(3)*100
