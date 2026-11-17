@@ -85,11 +85,11 @@ class Camera:
                     hitPos,hitNormal,hitColor = hitList[0]
 
                     pixelRay.vector = Vec3.scatterTowardsNormal(pixelRay.vector,hitNormal)
-                    lightStrength = Vec3.dot(pixelRay.vector,hitNormal)*2
+                    # lightStrength = Vec3.dot(pixelRay.vector,hitNormal)*2
                     # pixelRay.vector = Vec3.reflect(pixelRay.vector,hitNormal)
                     
                     pixelRay.incoming += hitColor.emission * pixelRay.color
-                    pixelRay.color *= hitColor.diffuse * lightStrength
+                    pixelRay.color *= hitColor.diffuse# * lightStrength
                     
                     pixelRay.origin = hitPos
                     # pixelRay.origin += pixelRay.vector*0.01
@@ -165,6 +165,6 @@ class Camera:
         
         elapsed = round(perf_counter()-tStart,1)
         if elapsed >= 60:
-            print(f'{elapsed//60} m {elapsed%60} s')
+            print(f'{int(elapsed//60)} m {int(elapsed%60)} s')
         else:
             print(f'{elapsed} s')

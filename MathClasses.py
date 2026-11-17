@@ -129,15 +129,12 @@ class Vec3:
 
         up,right,front = Vec3.getRelativeAxes(normal)
 
-        # EPSILON is minimum on z so the vector never has length 0.
-        randomPoint = Vec3(uniform(-1,1),uniform(-1,1),uniform(EPSILON,1)).normalized()
+        randomPoint = Vec3.randomVector()
 
-        d = randomPoint.length()
+        if randomPoint.length() == 0:
+            randomPoint = Vec3.UP
 
-        randomPoint.x /= d
-        randomPoint.y /= d
-
-        scatterVector = (right*randomPoint.x+front*randomPoint.y+up*randomPoint.z).normalized()
+        scatterVector = (normal + right*randomPoint.x+front*randomPoint.y+up*randomPoint.z).normalized()
 
         return scatterVector
 
@@ -151,6 +148,10 @@ class Vec3:
     @staticmethod
     def average(vectorList:list['Vec3']):
         return Vec3.vectorSum(vectorList)/len(vectorList)
+    
+    @staticmethod
+    def randomVector():
+        return Vec3(uniform(-1,1),uniform(-1,1),uniform(-1,1)).normalized()
     
     '''
     @MISC {13263,
