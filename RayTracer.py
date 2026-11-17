@@ -30,20 +30,8 @@ class Camera:
         self.aspectRatio = self.res[0]/self.res[1]
 
     def updateAxes(self):
-        if self.pos == self.lookAt:
-            self.front = Vec3(0,0,-1)
-        else:
-            self.front = (self.lookAt-self.pos).normalized()
+        self.front,self.right,self.up = Vec3.getRelativeAxes((self.lookAt-self.pos))
         
-        if self.front == Vec3.UP:
-            self.right = Vec3(-1,0,0)
-        elif self.front == -Vec3.UP:
-            self.right = Vec3(1,0,0)
-        else:
-            self.right = Vec3.cross(self.front,Vec3.UP)
-    
-        self.up = Vec3.cross(self.right,self.front)
-
     def updateSizeAndCanvas(self):
         self.updateAspectRatio()
         self.width = min(self.aspectRatio,1)
@@ -84,10 +72,11 @@ class Camera:
                 break
             else:
                 hitList = sorted(hitList,key=lambda x: (pixelRay.origin-x[0]).length())
-                # if bounce == 1:
-                #     return Vec3.UP if len(hitList) == 1 else Vec3.RIGHT
                 hitPos,hitNormal = hitList[0]
-                pixelRay.vector = Vec3.reflect(pixelRay.vector,hitNormal)
+
+                pixelRay.vector = Vec3.scatterTowardsNormal(pixelRay.vector,hitNormal)
+                # pixelRay.vector = Vec3.reflect(pixelRay.vector,hitNormal)
+                
                 pixelRay.origin = hitPos
                 # pixelRay.origin += pixelRay.vector*0.01
                 # print(hitList)

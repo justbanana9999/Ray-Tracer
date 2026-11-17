@@ -1,6 +1,6 @@
 from math import sqrt
 
-from MathClasses import Vec3
+from MathClasses import Vec3, EPSILON
 from Shapes import Ray, Sphere, Triangle
 
 def raySphereIntersection(ray:Ray,sphere:Sphere) -> tuple[bool, Vec3, Vec3]:
@@ -37,8 +37,6 @@ def raySphereIntersection(ray:Ray,sphere:Sphere) -> tuple[bool, Vec3, Vec3]:
 def rayTriangleIntersection(ray:Ray,triangle:Triangle) -> tuple[bool, Vec3, Vec3]:
 
     emptyReturn = (False,Vec3.ZERO,Vec3.ZERO)
-
-    EPSILON = 0.0001
 
     e1 = triangle.b-triangle.a
     e2 = triangle.c-triangle.a    

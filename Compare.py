@@ -3,7 +3,7 @@ from math import sqrt
 from PIL import Image
 
 img1 = Image.open('Blender.png')
-img2 = Image.open('test.png')
+img2 = Image.open('test copy.png')
 
 errorList = []
 

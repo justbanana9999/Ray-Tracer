@@ -1,5 +1,8 @@
 from math import dist
 from typing import ClassVar
+from random import uniform
+
+EPSILON = 0.0000001
 
 class Vec3:
     def __init__(self, x:float, y:float, z:float):
@@ -102,6 +105,41 @@ class Vec3:
     @staticmethod
     def reflect(incoming:'Vec3',normal:'Vec3'):
         return  incoming - normal*2*Vec3.dot(incoming,normal)
+
+    @staticmethod
+    def getRelativeAxes(diffVector:'Vec3'):
+        if diffVector == 0:
+            front = -Vec3.UP
+        else:
+            front = diffVector.normalized()
+
+        if front == Vec3.UP:
+            right = -Vec3.RIGHT
+        elif front == -Vec3.UP:
+            right = Vec3.RIGHT
+        else:
+            right = Vec3.cross(front,Vec3.UP)
+
+        up = Vec3.cross(right,front)
+
+        return (front,right,up)
+
+    @staticmethod
+    def scatterTowardsNormal(incoming:'Vec3',normal:'Vec3'):
+
+        up,right,front = Vec3.getRelativeAxes(normal)
+
+        # EPSILON is minimum on z so the vector never has length 0.
+        randomPoint = Vec3(uniform(-1,1),uniform(-1,1),uniform(EPSILON,1)).normalized()
+
+        d = randomPoint.length()
+
+        randomPoint.x /= d
+        randomPoint.y /= d
+
+        scatterVector = (right*randomPoint.x+front*randomPoint.y+up*randomPoint.z).normalized()
+
+        return scatterVector
     
     '''
     @MISC {13263,
@@ -114,8 +152,8 @@ class Vec3:
     }
     '''
     
-Vec3.UP     = Vec3(0,0,1)
-Vec3.RIGHT  = Vec3(1,0,0)
-Vec3.FORWARD  = Vec3(0,1,0)
-Vec3.ZERO   = Vec3(0,0,0)
-Vec3.ONE    = Vec3(1,1,1)
+Vec3.UP         = Vec3(0,0,1)
+Vec3.RIGHT      = Vec3(1,0,0)
+Vec3.FORWARD    = Vec3(0,1,0)
+Vec3.ZERO       = Vec3(0,0,0)
+Vec3.ONE        = Vec3(1,1,1)
