@@ -1,3 +1,5 @@
+from time import perf_counter
+
 from MathClasses import Vec3
 from Canvas import Canvas
 from Shapes import Ray, Scene, Sphere, Color
@@ -104,14 +106,47 @@ class Camera:
 
         return color
     
-    def render(self):
+    def render(self,progress:bool=False):
+        tStart = perf_counter()
+        tStart1 = perf_counter()
+        tStart2 = tStart1
         self.updateAxes()
         self.updateSizeAndCanvas()
         
+        rowSpeedAvg = 0
+        etaMeasureSize = 10
+        renderedRows = -1
+        
         for y in range(self.res[1]):
             
-            # if y == 0 or y+1 == self.res[1] or y%100 == 0:
-            #     print(f'\r{round((y+1)/self.res[1]*100,1)}%',end='',flush=True)
+            renderedRows += 1
+            if progress:
+                # Updates progress every second.
+                elapsed1 = perf_counter()-tStart1
+                elapsed2 = perf_counter()-tStart2
+                if elapsed2 > etaMeasureSize:
+                    tStart2 = perf_counter()
+                    rowSpeedAvg = renderedRows/etaMeasureSize
+                    renderedRows = 0
+                
+                if elapsed1 > 1:
+                    tStart1 = perf_counter()
+                    percentage = f'{round((y+1)/self.res[1]*100,1)}%'
+                    percentage = percentage.ljust(5,' ')
+
+                    if rowSpeedAvg == 0:
+                        if perf_counter()-tStart < 10:
+                            eta = 'Gathering eta'
+                        else:
+                            eta = '∞'
+                    else:
+                        etaInt = int((self.res[1]-y)/rowSpeedAvg)
+                        if etaInt >= 60:
+                            eta = f'{etaInt//60} m {etaInt%60} s'
+                        else:
+                            eta = f'{etaInt} s'
+                    end = ' '*10
+                    print(f'\r{percentage} | {eta} | {rowSpeedAvg}/s {end}',end='',flush=True)
 
             for x in range(self.res[0]):
                 color = self.shootRayFromPixel(x,y)
@@ -120,4 +155,5 @@ class Camera:
         # print(self.canvas)
         self.canvas.saveToFile('test.png')
 
-        # print(' '*10,end='\r')
+        if progress:
+            print(' '*50,end='\r')

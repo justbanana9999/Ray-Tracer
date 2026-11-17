@@ -2,7 +2,7 @@ from RayTracer import Camera
 from MathClasses import Vec3
 from Shapes import Scene, Sphere, Triangle, Color
 
-from time import time
+from time import perf_counter
 
 scene = Scene(
     [
@@ -18,11 +18,11 @@ scene = Scene(
 # cam = Camera(Vec3(0,0,0),Vec3(0,1,0),(1920,1080),25,scene,20)
 
 # cam = Camera(Vec3(0,0,0),Vec3(0,1,0),(100,100),25,scene,4)
-cam = Camera(Vec3(0,0,0),Vec3(0,1,0),(100,100),25,scene,4,50)
+cam = Camera(Vec3(0,0,0),Vec3(0,1,0),(500,500),25,scene,4,100)
 
-tStart = time()
+tStart = perf_counter()
 
-cam.render()
+cam.render(True)
 
-tEnd = time()
+tEnd = perf_counter()
 print(f'{round(tEnd-tStart,3)} s')
