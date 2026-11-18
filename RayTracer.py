@@ -1,4 +1,4 @@
-from random import seed
+from random import seed, shuffle
 from time import perf_counter
 
 from MathClasses import Vec3
@@ -108,65 +108,77 @@ class Camera:
 
         return color
     
-    def render(self,progress:bool=False):
+    def render(self,progress:bool=False,etaMeasureSize:float=2):
         tStart = perf_counter()
         tStart1 = perf_counter()
         tStart2 = tStart1
         self.updateAxes()
         self.updateSizeAndCanvas()
         
-        rowSpeedAvg = 0
-        rayCalcSpeedAvg = 0
-        etaMeasureSize = 10
-        renderedRows = -1
+        avgSpeed = 0
+        renderedPixels = -1
         
+        pixelIndex = -1
+
+        remainingPixels:list[tuple[int,int]] = []
+
         for y in range(self.res[1]):
+            for x in range(self.res[0]):
+                remainingPixels.append((x,y))
+
+        shuffle(remainingPixels)
+
+        for x,y in remainingPixels:
+            pixelIndex += 1
+            renderedPixels += 1
             
-            renderedRows += 1
             if progress:
                 # Updates progress every second.
                 elapsed1 = perf_counter()-tStart1
                 elapsed2 = perf_counter()-tStart2
+                
+                if elapsed1 > 10:
+                    tStart1 = perf_counter()
+                    self.canvas.saveToFile('test.png')
+
                 if elapsed2 > etaMeasureSize:
                     tStart2 = perf_counter()
-                    rowSpeedAvg = renderedRows/etaMeasureSize
-                    # pixels * samples
-                    rayCalcSpeedAvg = int(rowSpeedAvg*self.res[0])
-                    renderedRows = 0
-                
-                if elapsed1 > 0.5:
-                    tStart1 = perf_counter()
-                    percentage = f'{round((y+1)/self.res[1]*100,1)}%'
+
+                    percentage = f'{round((pixelIndex+1)/len(remainingPixels)*100,1)}%'
                     percentage = percentage.ljust(5,' ')
 
-                    if rowSpeedAvg == 0:
-                        if perf_counter()-tStart < 10:
+                    if avgSpeed == 0:
+                        if perf_counter()-tStart < etaMeasureSize:
                             eta = 'Gathering eta'
                         else:
-                            eta = '∞'
+                            eta = 'infinity'
                     else:
-                        etaInt = int((self.res[1]-y)/rowSpeedAvg)
-                        if etaInt >= 60:
+                        etaInt = int((len(remainingPixels)-renderedPixels)/avgSpeed)
+                        if etaInt >= 3600:
+                            eta = f'{etaInt//3600} h {(etaInt%3600)//60} m {etaInt%60} s'
+                        elif etaInt >= 60:
                             eta = f'{etaInt//60} m {etaInt%60} s'
                         else:
                             eta = f'{etaInt} s'
                     end = ' '*10
-                    print(f'\r{percentage} | {eta} | {rayCalcSpeedAvg} r/s {end}',end='',flush=True)
+                    print(f'\r{percentage} | {eta} | {avgSpeed} px/s {end}',end='')
+                    
+                    avgSpeed = renderedPixels/etaMeasureSize
+                    renderedPixels = 0
 
-            for x in range(self.res[0]):
-                seed(y*self.res[0]+x)
-                color = self.shootRayFromPixel(x,y)
-                self.canvas.putPixel((x,y),color)
+            seed(y*self.res[0]+x)
+            color = self.shootRayFromPixel(x,y)
+            self.canvas.putPixel((x,y),color)
         
-        # print(self.canvas)
         self.canvas.saveToFile('test.png')
 
         if progress:
-            print()
-            # print(' '*50,end='\r')
+            print('\r'+' '*50,end='')
         
         elapsed = round(perf_counter()-tStart,1)
-        if elapsed >= 60:
+        if elapsed >= 3600:
+            print(f'{int(elapsed%3600)} h {int((elapsed%3600)//60)} m {int(elapsed%60)} s')
+        elif elapsed >= 60:
             print(f'{int(elapsed//60)} m {int(elapsed%60)} s')
         else:
             print(f'{elapsed} s')

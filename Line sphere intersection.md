@@ -80,7 +80,7 @@ $d = -[û \cdot (o-c)] \pm \sqrt{\nabla}$
 Now we can find the amount of intersections based on the three cases:
 
 - $\nabla < 0$ : No solutions $\iff$ No intersections
-- $\nabla = 0$ : No solution $\iff$ One intersection
+- $\nabla = 0$ : One solution $\iff$ One intersection
 - $\nabla > 0$ : Two solutions $\iff$ Two intersections
 
 ***
