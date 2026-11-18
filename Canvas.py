@@ -15,11 +15,7 @@ class Canvas:
         return '\n'.join([' '.join([col.toTupleRounded(2) for col in row]) for row in self.pixelList])
 
     def initialize(self):
-        self.pixelList = []
-        for _ in range(self.resY):
-            self.pixelList.append([])
-            for _ in range(self.resX):
-                self.pixelList[-1].append(Vec3.ZERO)
+        self.pixelList = [[Vec3.ZERO for _ in range(self.resX)] for _ in range(self.resY)]
     
     def putPixel(self,pos:tuple[int,int],color:Vec3):
         color.x = min(max(color.x,0),1)
@@ -29,9 +25,16 @@ class Canvas:
         self.pixelList[pos[1]][pos[0]] = color
 
     def convertToImage(self):
-        for y in range(self.resY):
-            for x in range(self.resX):
-                self.img.putpixel((x,y),(self.pixelList[y][x]*255).toIntTuple())
+        # print(self.pixelList[0][0])
+        # print([pixel for pixel in [row for row in self.pixelList]])
+        convertedList:list[tuple[int,int,int]] = []
+        for row in self.pixelList:
+            for pixel in row:
+                convertedList.append(Vec3.toIntTuple(pixel*255))
+        self.img.putdata(convertedList)  # pyright: ignore[reportUnknownMemberType]
+        # for y in range(self.resY):
+        #     for x in range(self.resX):
+        #         self.img.putpixel((x,y),(self.pixelList[y][x]*255).toIntTuple())
     
     def saveToFile(self,path:str):
         self.convertToImage()

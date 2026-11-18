@@ -1,3 +1,20 @@
+from copy import copy
+from multiprocessing import Pool
+
+_worker_camera = None
+
+def _initialize_worker(camera:Camera):
+    global _worker_camera
+    _worker_camera = camera
+
+def _render_pixel(pixel):
+    x,y = pixel
+    seed(y*_worker_camera.res[0]+x)
+    color = _worker_camera.shootRayFromPixel(x,y)
+    return x,y,color
+
+from os import cpu_count
+
 from random import seed, shuffle
 from time import perf_counter
 
@@ -31,6 +48,35 @@ class Camera:
         self.maxBounces = maxBounces
         self.samples = samples
     
+    def render_parallel(self,processes=None):
+        self.updateAxes()
+        self.updateSizeAndCanvas()
+
+        worker_camera = copy(self)
+        worker_camera.canvas = None
+
+        pixels = [
+            (x,y)
+            for y in range(self.res[1])
+            for x in range(self.res[0])
+        ]
+
+        worker_count = processes or max(1,cpu_count()-1)
+
+        with Pool(
+            processes = worker_count,
+            initializer = _initialize_worker,
+            initargs = (worker_camera,),
+        ) as pool:
+            for x,y,color in pool.imap_unordered(
+                _render_pixel,
+                pixels,
+                chunksize=16,
+            ):
+                self.canvas.putPixel((x,y),color)
+    
+        self.canvas.saveToFile('test.py')
+
     def updateAspectRatio(self):
         self.aspectRatio = self.res[0]/self.res[1]
 
@@ -57,7 +103,7 @@ class Camera:
 
         startPixelPos = self.getPixelLocalPos(x,y)
 
-        triangleList:dict[str,(tuple[bool,Vec3,Vec3])] = {}
+        # triangleList:dict[str,(tuple[bool,Vec3,Vec3])] = {}
 
         for _ in range(self.samples):
             pixelRay = Ray(self.pos,startPixelPos.normalized())
@@ -74,11 +120,11 @@ class Camera:
                     if isinstance(shape,Sphere):
                         hit,hitPos,hitNormal = raySphereIntersection(pixelRay,shape)
                     else:
-                        if bounce == 0:
-                            if (s:=str(shape)) not in triangleList.keys():
-                                triangleList[s] = rayTriangleIntersection(pixelRay,shape)
-                            hit,hitPos,hitNormal = triangleList[s]
-                        else:
+                        # if bounce == 0:
+                        #     if (s:=str(shape)) not in triangleList.keys():
+                        #         triangleList[s] = rayTriangleIntersection(pixelRay,shape)
+                        #     hit,hitPos,hitNormal = triangleList[s]
+                        # else:
                             hit,hitPos,hitNormal = rayTriangleIntersection(pixelRay,shape)
                     if hit:
                         if (d:=(hitPos-pixelRay.origin).length()) < minDist:

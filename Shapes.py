@@ -21,6 +21,8 @@ class Sphere:
         self.radius = radius
         self.material = material
 
+        self.radius2 = radius**2
+
 class Triangle:
     def __init__(self,a:Vec3,b:Vec3,c:Vec3,material:Material=Material(Vec3.ONE*0.95)):
         self.a = a

@@ -8,11 +8,12 @@ def raySphereIntersection(ray:Ray,sphere:Sphere) -> tuple[bool, Vec3, Vec3]:
     emptyReturn = (False,Vec3.ZERO,Vec3.ZERO)
 
     c = sphere.center
-    r = sphere.radius
+    r2 = sphere.radius2
     o = ray.origin
+    
     u = ray.vector.normalized()
 
-    nabla = (Vec3.dot(u,o-c))**2 - (o-c).lengthSquared() + r**2
+    nabla = (Vec3.dot(u,o-c))**2 - (o-c).lengthSquared() + r2
     if nabla == 0:
         d = -Vec3.dot(u,o-c)
         hitPoint = o+u*d

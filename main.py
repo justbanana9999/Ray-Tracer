@@ -20,4 +20,7 @@ scene = Scene(
 
 cam = Camera(Vec3(0,0,0),Vec3(0,3,0),(200,200),25,scene,4,100)
 
-cam.render(True)
+if __name__ == '__main__':
+    cam.render_parallel()
+
+# cam.render(True)
