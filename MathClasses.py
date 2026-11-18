@@ -1,8 +1,8 @@
-from math import cos, dist, pi, sin, sqrt
+from math import dist
 from typing import ClassVar
-from random import uniform, random
+from random import uniform
 
-EPSILON = 0.0000001
+EPSILON = 1e-6
 
 class Vec3:
     def __init__(self, x:float, y:float, z:float):
@@ -141,39 +141,6 @@ class Vec3:
 
         return scatterVector
     
-    @staticmethod
-    def ggx(incoming:'Vec3',normal:'Vec3',roughness:float):
-        
-        up,right,front = Vec3.getRelativeAxes(normal)
-        
-        a,b = random(),random()
-        phi = 2*pi*a
-        cosTheta = sqrt((1-b)/(1+(roughness**4-1)*b))
-        sinTheta = sqrt(1-cosTheta**2)
-
-        x = sinTheta*cos(phi)
-        y = sinTheta*sin(phi)
-        z = cosTheta
-
-        worldNormal = (right*x+front*y+up*z).normalized()
-
-        reflected = Vec3.reflect(incoming,worldNormal).normalized()
-
-        # D = (roughness**4)/(pi*(Vec3.dot(normal,worldNormal)**2*(roughness**4-1)+1)**2)
-
-        # p = (D*Vec3.dot(normal,worldNormal))/(4*Vec3.dot(incoming,worldNormal))
-
-        G_V = (2*Vec3.dot(normal,incoming))/(Vec3.dot(normal,incoming)+sqrt(roughness**4+(1-roughness**4)*(Vec3.dot(normal,incoming))**2))
-        G_L = (2*Vec3.dot(normal,reflected))/(Vec3.dot(normal,reflected)+sqrt(roughness**4+(1-roughness**4)*(Vec3.dot(normal,reflected))**2))
-
-        G = G_V*G_L
-
-        F = Vec3(0.8,0.8,0.8)+(Vec3.ONE-Vec3(0.8,0.8,0.8))*(1-(Vec3.dot(incoming,worldNormal))**5)
-
-        weight = (F*G*Vec3.dot(incoming,worldNormal))/(Vec3.dot(normal,incoming)*Vec3.dot(normal,worldNormal))
-
-        return reflected,weight
-
     @staticmethod
     def vectorSum(vectorList:list['Vec3']):
         s = Vec3.ZERO

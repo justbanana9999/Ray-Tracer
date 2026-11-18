@@ -84,14 +84,12 @@ class Camera:
                     hitList = sorted(hitList,key=lambda x: (pixelRay.origin-x[0]).length())
                     hitPos,hitNormal,hitColor = hitList[0]
 
-                    # diffuseVector = Vec3.scatterTowardsNormal(pixelRay.vector,hitNormal)
-                    # specularVector = Vec3.reflect(pixelRay.vector,hitNormal)
-                    # pixelRay.vector = Vec3.interpolate(specularVector,diffuseVector,hitColor.roughness**2).normalized()
-
-                    pixelRay.vector,weight = Vec3.ggx(pixelRay.vector,hitNormal,hitColor.roughness)
+                    diffuseVector = Vec3.scatterTowardsNormal(pixelRay.vector,hitNormal)
+                    specularVector = Vec3.reflect(pixelRay.vector,hitNormal)
+                    pixelRay.vector = Vec3.interpolate(specularVector,diffuseVector,hitColor.roughness**2).normalized()
                     
                     pixelRay.incoming += hitColor.emission * pixelRay.color
-                    pixelRay.color *= hitColor.diffuse * weight
+                    pixelRay.color *= hitColor.diffuse
                     
                     pixelRay.origin = hitPos
 

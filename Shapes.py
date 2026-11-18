@@ -72,6 +72,66 @@ class Triangle:
                     material,
                 ),
             ]
+        elif orientation == 'RIGHT':
+            return [
+                Triangle(
+                    Vec3(center.x,center.y-size[1],center.z-size[0]),
+                    Vec3(center.x,center.y+size[1],center.z-size[0]),
+                    Vec3(center.x,center.y-size[1],center.z+size[0]),
+                    material,
+                ),
+                Triangle(
+                    Vec3(center.x,center.y+size[1],center.z+size[0]),
+                    Vec3(center.x,center.y-size[1],center.z+size[0]),
+                    Vec3(center.x,center.y+size[1],center.z-size[0]),
+                    material,
+                ),
+            ]
+        elif orientation == 'LEFT':
+            return [
+                Triangle(
+                    Vec3(center.x,center.y-size[1],center.z+size[0]),
+                    Vec3(center.x,center.y+size[1],center.z-size[0]),
+                    Vec3(center.x,center.y-size[1],center.z-size[0]),
+                    material,
+                ),
+                Triangle(
+                    Vec3(center.x,center.y+size[1],center.z-size[0]),
+                    Vec3(center.x,center.y-size[1],center.z+size[0]),
+                    Vec3(center.x,center.y+size[1],center.z+size[0]),
+                    material,
+                ),
+            ]
+        elif orientation == 'BACK':
+            return [
+                Triangle(
+                    Vec3(center.x-size[1],center.y,center.z-size[0]),
+                    Vec3(center.x+size[1],center.y,center.z-size[0]),
+                    Vec3(center.x-size[1],center.y,center.z+size[0]),
+                    material,
+                ),
+                Triangle(
+                    Vec3(center.x+size[1],center.y,center.z+size[0]),
+                    Vec3(center.x-size[1],center.y,center.z+size[0]),
+                    Vec3(center.x+size[1],center.y,center.z-size[0]),
+                    material,
+                ),
+            ]
+        elif orientation == 'FRONT':
+            return [
+                Triangle(
+                    Vec3(center.x-size[1],center.y,center.z+size[0]),
+                    Vec3(center.x+size[1],center.y,center.z-size[0]),
+                    Vec3(center.x-size[1],center.y,center.z-size[0]),
+                    material,
+                ),
+                Triangle(
+                    Vec3(center.x+size[1],center.y,center.z-size[0]),
+                    Vec3(center.x-size[1],center.y,center.z+size[0]),
+                    Vec3(center.x+size[1],center.y,center.z+size[0]),
+                    material,
+                ),
+            ]
         else:
             return [
                 Triangle(
