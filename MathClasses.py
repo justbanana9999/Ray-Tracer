@@ -1,6 +1,6 @@
-from math import dist
+from math import cos, dist, pi, sin, sqrt
 from typing import ClassVar
-from random import uniform
+from random import random, uniform
 
 EPSILON = 1e-6
 
@@ -160,6 +160,11 @@ class Vec3:
     def interpolate(a:'Vec3',b:'Vec3',w:float):
         return a+(b-a)*w
     
+    @staticmethod
+    def randomPointInCircle():
+        angle = uniform(0,2*pi)
+        return Vec3(sin(angle),0,cos(angle))*sqrt(random())
+
     '''
     @MISC {13263,
         TITLE = {How to get a reflection vector?},

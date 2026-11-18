@@ -1,5 +1,6 @@
 from copy import copy
 from multiprocessing import Pool
+from tracemalloc import start
 
 _worker_camera = None
 
@@ -14,6 +15,7 @@ def _render_pixel(pixel):
     return x,y,color
 
 from os import cpu_count
+from tqdm import tqdm
 
 from random import seed, shuffle
 from time import perf_counter
@@ -24,7 +26,7 @@ from Shapes import Ray, Scene, Sphere, Material
 from intersections import raySphereIntersection, rayTriangleIntersection
 
 class Camera:
-    def __init__(self,pos:Vec3,pointAt:Vec3,res:tuple[int,int],focalLength:float,scene:Scene,maxBounces:int,samples:int):
+    def __init__(self,pos:Vec3,pointAt:Vec3,res:tuple[int,int],focalLength:float,scene:Scene,maxBounces:int,samples:int,blur:float=0):
         self.res = res
         self.pos = pos
         self.lookAt = pointAt
@@ -47,8 +49,13 @@ class Camera:
 
         self.maxBounces = maxBounces
         self.samples = samples
+
+        self.blur = blur
+        self.focusDistance = 0
     
     def render_parallel(self,processes=None):
+        tStart = perf_counter()
+
         self.updateAxes()
         self.updateSizeAndCanvas()
 
@@ -68,14 +75,24 @@ class Camera:
             initializer = _initialize_worker,
             initargs = (worker_camera,),
         ) as pool:
-            for x,y,color in pool.imap_unordered(
-                _render_pixel,
-                pixels,
-                chunksize=16,
+            for x,y,color in tqdm(
+                pool.imap_unordered(_render_pixel,pixels,chunksize=16),
+                total = len(pixels),
+                desc = 'Rendering',
+                unit = ' px'
             ):
                 self.canvas.putPixel((x,y),color)
     
-        self.canvas.saveToFile('test.py')
+        self.canvas.saveToFile('test.png')
+
+        elapsed = round(perf_counter()-tStart,1)
+        if elapsed >= 3600:
+            print(f'\r{int(elapsed%3600)} h {int((elapsed%3600)//60)} m {int(elapsed%60)} s')
+        elif elapsed >= 60:
+            print(f'\r{int(elapsed//60)} m {int(elapsed%60)} s')
+        else:
+            print(f'\r{elapsed} s')
+
 
     def updateAspectRatio(self):
         self.aspectRatio = self.res[0]/self.res[1]
@@ -87,6 +104,7 @@ class Camera:
         self.updateAspectRatio()
         self.width = min(self.aspectRatio,1)
         self.height = min(1/self.aspectRatio,1)
+        self.focusDistance = (self.lookAt-self.pos).length()
 
         self.canvas = Canvas(self.res[0],self.res[1])
 
@@ -101,12 +119,27 @@ class Camera:
     def shootRayFromPixel(self,x:int,y:int) -> Vec3:
         colorList:list[Vec3] = []
 
-        startPixelPos = self.getPixelLocalPos(x,y)
+        startPixelPos = self.pos + self.getPixelLocalPos(x,y)
+
+        rayTarget = startPixelPos*self.focusDistance
+
+        # print(pixelWorldFocus)
+        # print(self.focusDistance)
 
         # triangleList:dict[str,(tuple[bool,Vec3,Vec3])] = {}
 
         for _ in range(self.samples):
-            pixelRay = Ray(self.pos,startPixelPos.normalized())
+            defocusJitter = Vec3.randomPointInCircle()*self.blur
+            defocusJitterLocalPos = self.right*defocusJitter.x+self.up*defocusJitter.z
+                        
+            jitter = Vec3.randomPointInCircle()*self.pixelSize/2
+            jitterLocalPos = self.right*jitter.x+self.up*jitter.z
+
+            rayOrigin = self.pos + defocusJitterLocalPos + jitterLocalPos
+
+            rayDir = (rayTarget-rayOrigin).normalized()
+
+            pixelRay = Ray(rayOrigin,rayDir)
 
             bounce = 0
             while bounce < self.maxBounces+3:
