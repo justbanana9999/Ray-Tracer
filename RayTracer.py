@@ -50,39 +50,47 @@ class Camera:
 
         self.topLeftPixel = -self.right*(self.width-self.pixelSize)/2 + self.up*(self.height-self.pixelSize)/2 + self.front*(self.focalLength/36)
 
-        self.pixelPos = self.topLeftPixel + self.right*self.pixelSize*x - self.up*self.pixelSize*y
+        return self.topLeftPixel + self.right*self.pixelSize*x - self.up*self.pixelSize*y
     
     def shootRayFromPixel(self,x:int,y:int) -> Vec3:
         colorList:list[Vec3] = []
 
+        startPixelPos = self.getPixelLocalPos(x,y)
+
+        triangleList:dict[str,(tuple[bool,Vec3,Vec3])] = {}
+
         for _ in range(self.samples):
-            self.getPixelLocalPos(x,y)
-            pixelRay = Ray(self.pos,self.pixelPos.normalized())
+            pixelRay = Ray(self.pos,startPixelPos.normalized())
 
             bounce = 0
             while bounce < self.maxBounces+3:
                 if bounce == self.maxBounces+2:
                     pixelRay.color = Vec3.ZERO
-                hitList:list[tuple[Vec3,Vec3,Material]] = []
+                hitPos,hitNormal = Vec3.ZERO,Vec3.ZERO,
+                closest = (Vec3.ZERO,Vec3.ZERO,Material())
+                minDist = 1e6
                 hit = False
                 for shape in self.scene.shapeList:
                     if isinstance(shape,Sphere):
                         hit,hitPos,hitNormal = raySphereIntersection(pixelRay,shape)
-                    # elif isinstance(shape,Triangle):
                     else:
-                        hit,hitPos,hitNormal = rayTriangleIntersection(pixelRay,shape)
-                    
+                        if bounce == 0:
+                            if (s:=str(shape)) not in triangleList.keys():
+                                triangleList[s] = rayTriangleIntersection(pixelRay,shape)
+                            hit,hitPos,hitNormal = triangleList[s]
+                        else:
+                            hit,hitPos,hitNormal = rayTriangleIntersection(pixelRay,shape)
                     if hit:
-                        hitList.append((hitPos,hitNormal,shape.color))
+                        if (d:=(hitPos-pixelRay.origin).length()) < minDist:
+                            minDist = d
+                            closest = (hitPos,hitNormal,shape.material)
                 
-                if len(hitList) == 0:
-                    # print(bounce,pixelRay)
+                if minDist == 1e6:
                     if bounce == 0:
                         pixelRay.color = Vec3.ZERO
                     break
                 else:
-                    hitList = sorted(hitList,key=lambda x: (pixelRay.origin-x[0]).length())
-                    hitPos,hitNormal,hitColor = hitList[0]
+                    hitPos,hitNormal,hitColor = closest
 
                     diffuseVector = Vec3.scatterTowardsNormal(pixelRay.vector,hitNormal)
                     specularVector = Vec3.reflect(pixelRay.vector,hitNormal)
@@ -153,7 +161,7 @@ class Camera:
                         else:
                             eta = 'infinity'
                     else:
-                        etaInt = int((len(remainingPixels)-renderedPixels)/avgSpeed)
+                        etaInt = int((len(remainingPixels)-pixelIndex)/avgSpeed)
                         if etaInt >= 3600:
                             eta = f'{etaInt//3600} h {(etaInt%3600)//60} m {etaInt%60} s'
                         elif etaInt >= 60:
@@ -177,8 +185,8 @@ class Camera:
         
         elapsed = round(perf_counter()-tStart,1)
         if elapsed >= 3600:
-            print(f'{int(elapsed%3600)} h {int((elapsed%3600)//60)} m {int(elapsed%60)} s')
+            print(f'\r{int(elapsed%3600)} h {int((elapsed%3600)//60)} m {int(elapsed%60)} s')
         elif elapsed >= 60:
-            print(f'{int(elapsed//60)} m {int(elapsed%60)} s')
+            print(f'\r{int(elapsed//60)} m {int(elapsed%60)} s')
         else:
-            print(f'{elapsed} s')
+            print(f'\r{elapsed} s')

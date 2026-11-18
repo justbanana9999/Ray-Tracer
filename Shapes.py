@@ -19,7 +19,7 @@ class Sphere:
     def __init__(self,center:Vec3,radius:float,material:Material=Material(Vec3.ONE*0.95)):
         self.center = center
         self.radius = radius
-        self.color = material
+        self.material = material
 
 class Triangle:
     def __init__(self,a:Vec3,b:Vec3,c:Vec3,material:Material=Material(Vec3.ONE*0.95)):
@@ -30,7 +30,7 @@ class Triangle:
         self.normal:Vec3
         self.generateNormal()
 
-        self.color = material
+        self.material = material
     
     def __repr__(self):
         return f' a = {self.a}, b = {self.b}, c = {self.c}'
