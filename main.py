@@ -1,13 +1,13 @@
 from RayTracer import Camera
 from MathClasses import Vec3
-from Shapes import Scene, Sphere, Triangle, Color
+from Shapes import Scene, Sphere, Triangle, Material
 
 scene = Scene(
     [
-        Sphere(Vec3(0,3,0),1,Color(Vec3(1,0,0))),
-        Sphere(Vec3(0,20,0),10,Color(emission=Vec3(1,1,1))),
+        Sphere(Vec3(0,3,0),1,Material(Vec3(1,0,0))),
+        Sphere(Vec3(0,20,0),10,Material(emission=Vec3(1,1,1))),
         
-        *Triangle.generatePlane(Vec3(0,3,-1),(3,3),'UP'),
+        *Triangle.generatePlane(Vec3(0,3,-1),(3,3),Material(roughness=0.3)),
     ]
     )
 

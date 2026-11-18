@@ -3,7 +3,7 @@ from time import perf_counter
 
 from MathClasses import Vec3
 from Canvas import Canvas
-from Shapes import Ray, Scene, Sphere, Color
+from Shapes import Ray, Scene, Sphere, Material
 from intersections import raySphereIntersection, rayTriangleIntersection
 
 class Camera:
@@ -63,7 +63,7 @@ class Camera:
             while bounce < self.maxBounces+3:
                 if bounce == self.maxBounces+2:
                     pixelRay.color = Vec3.ZERO
-                hitList:list[tuple[Vec3,Vec3,Color]] = []
+                hitList:list[tuple[Vec3,Vec3,Material]] = []
                 hit = False
                 for shape in self.scene.shapeList:
                     if isinstance(shape,Sphere):
@@ -84,15 +84,19 @@ class Camera:
                     hitList = sorted(hitList,key=lambda x: (pixelRay.origin-x[0]).length())
                     hitPos,hitNormal,hitColor = hitList[0]
 
-                    pixelRay.vector = Vec3.scatterTowardsNormal(pixelRay.vector,hitNormal)
-                    # lightStrength = Vec3.dot(pixelRay.vector,hitNormal)*2
-                    # pixelRay.vector = Vec3.reflect(pixelRay.vector,hitNormal)
+                    # diffuseVector = Vec3.scatterTowardsNormal(pixelRay.vector,hitNormal)
+                    # specularVector = Vec3.reflect(pixelRay.vector,hitNormal)
+                    # pixelRay.vector = Vec3.interpolate(specularVector,diffuseVector,hitColor.roughness**2).normalized()
+
+                    pixelRay.vector,weight = Vec3.ggx(pixelRay.vector,hitNormal,hitColor.roughness)
                     
                     pixelRay.incoming += hitColor.emission * pixelRay.color
-                    pixelRay.color *= hitColor.diffuse# * lightStrength
+                    pixelRay.color *= hitColor.diffuse * weight
                     
                     pixelRay.origin = hitPos
+
                     # pixelRay.origin += pixelRay.vector*0.01
+                    
                 bounce += 1
             
             # colorList.append(pixelRay.color)
