@@ -4,23 +4,23 @@ from Shapes import Scene, Sphere, Triangle, Material
 
 scene = Scene(
     [
-        Sphere(Vec3(0,3,0),1,Material(roughness=0.5)),
-        Sphere(Vec3(-2,5,-0.5),0.5,Material()),
-        Sphere(Vec3(1,1.5,-0.5),0.5,Material()),
+        Sphere(Vec3(0,3,1),1,Material(roughness=0.5)),
+        Sphere(Vec3(-1.5,4.5,0.5),0.5,Material()),
+        Sphere(Vec3(1,1.5,0.5),0.5,Material()),
         
-        *Triangle.generatePlane(Vec3(0,3,-1),(2,2),Material(diffuse=Vec3(0,1,0))),
-        *Triangle.generatePlane(Vec3(0,3,2),(2,2),Material(),'DOWN'),
-        *Triangle.generatePlane(Vec3(0,3,1.9),(1,1),Material(emission=Vec3(4,4,4)),'DOWN'),
-        *Triangle.generatePlane(Vec3(-2,3,1),(2,2),Material(diffuse=Vec3(1,0,0)),'RIGHT'),
-        *Triangle.generatePlane(Vec3(2,3,1),(2,2),Material(diffuse=Vec3(0,0,1)),'LEFT'),
-        *Triangle.generatePlane(Vec3(0,5,1),(2,2),Material(diffuse=Vec3(1,0,1)),'BACK'),
-        *Triangle.generatePlane(Vec3(0,1,1),(2,2),Material(diffuse=Vec3(1,1,1)),'FRONT'),
+        *Triangle.generatePlane(Vec3(0,3,0),(2,2),Material(diffuse=Vec3(0,1,0))),
+        *Triangle.generatePlane(Vec3(0,3,4),(2,2),Material(),'DOWN'),
+        *Triangle.generatePlane(Vec3(0,3,3.9),(1,1),Material(emission=Vec3(4,4,4)),'DOWN'),
+        *Triangle.generatePlane(Vec3(-2,3,2),(2,2),Material(diffuse=Vec3(1,0,0)),'RIGHT'),
+        *Triangle.generatePlane(Vec3(2,3,2),(2,2),Material(diffuse=Vec3(0,0,1)),'LEFT'),
+        *Triangle.generatePlane(Vec3(0,5,2),(2,2),Material(diffuse=Vec3(1,0,1)),'BACK'),
+        *Triangle.generatePlane(Vec3(0,1,2),(2,2),Material(diffuse=Vec3(1,1,1)),'FRONT'),
     ]
     )
 
-cam = Camera(Vec3(-1,0,0),Vec3(0,3,0),(100,100),25,scene,4,100,0.5)
+# cam = Camera(Vec3(-1,-2,2),Vec3(0,3,2),(100,100),25,scene,4,100,0.5)
 
-# cam = Camera(Vec3(0,0,0),Vec3(0,3,0),(800,800),25,scene,4,100)
+cam = Camera(Vec3(-1,-2,2),Vec3(0,3,2),(800,800),25,scene,4,100,0.5)
 
 if __name__ == '__main__':
     cam.render_parallel()

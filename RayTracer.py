@@ -119,9 +119,9 @@ class Camera:
     def shootRayFromPixel(self,x:int,y:int) -> Vec3:
         colorList:list[Vec3] = []
 
-        startPixelPos = self.pos + self.getPixelLocalPos(x,y)
+        startPixelPos = self.getPixelLocalPos(x,y)
 
-        rayTarget = startPixelPos*self.focusDistance
+        rayTarget = self.pos + (startPixelPos*self.focusDistance/(self.focalLength/36))
 
         # print(pixelWorldFocus)
         # print(self.focusDistance)
